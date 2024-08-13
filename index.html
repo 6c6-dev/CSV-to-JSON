@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV to JSON Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input[type="file"] {
+            margin: 20px 0;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        pre {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        #downloadLink {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        #downloadLink:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CSV to JSON Converter</h1>
+        <p>Select a CSV file to convert to JSON:</p>
+        <input type="file" id="csvFile" accept=".csv">
+        <button onclick="convertCSVToJSON()">Convert</button>
+        <pre id="output"></pre>
+        <a id="downloadLink" style="display:none;">Download JSON</a>
+    </div>
+    <script>
+        function convertCSVToJSON() {
+            const fileInput = document.getElementById('csvFile');
+            const output = document.getElementById('output');
+            const downloadLink = document.getElementById('downloadLink');
+
+            if (!fileInput.files.length) {
+                alert('Please choose a CSV file first.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csv = e.target.result;
+                const lines = csv.split("\n");
+                const result = [];
+                const headers = lines[0].split(",");
+
+                for (let i = 1; i < lines.length; i++) {
+                    const obj = {};
+                    const currentline = lines[i].split(",");
+
+                    for (let j = 0; j < headers.length; j++) {
+                        obj[headers[j].trim()] = currentline[j] ? currentline[j].trim() : null;
+                    }
+                    result.push(obj);
+                }
+
+                const json = JSON.stringify(result, null, 4);
+                output.textContent = json;
+
+                // Create download link
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.download = 'output.json';
+                downloadLink.style.display = 'block';
+            };
+
+            reader.readAsText(fileInput.files[0]);
+        }
+    </script>
+</body>
+</html>
