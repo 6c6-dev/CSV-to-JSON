@@ -30,8 +30,12 @@
             color: #333;
         }
 
-        input[type="file"] {
+        input[type="file"], select {
             margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
         }
 
         button {
@@ -79,6 +83,12 @@
         <h1>CSV to JSON Converter</h1>
         <p>Select a CSV file to convert to JSON:</p>
         <input type="file" id="csvFile" accept=".csv">
+        <select id="delimiter">
+            <option value=",">Comma (,)</option>
+            <option value=";">Semicolon (;)</option>
+            <option value="|">Pipe (|)</option>
+            <option value="\t">Tab (\\t)</option>
+        </select>
         <button onclick="convertCSVToJSON()">Convert</button>
         <pre id="output"></pre>
         <a id="downloadLink" style="display:none;">Download JSON</a>
@@ -86,6 +96,8 @@
     <script>
         function convertCSVToJSON() {
             const fileInput = document.getElementById('csvFile');
+            const delimiterSelect = document.getElementById('delimiter');
+            const delimiter = delimiterSelect.value;
             const output = document.getElementById('output');
             const downloadLink = document.getElementById('downloadLink');
 
@@ -99,11 +111,11 @@
                 const csv = e.target.result;
                 const lines = csv.split("\n");
                 const result = [];
-                const headers = lines[0].split(",");
+                const headers = lines[0].split(delimiter);
 
                 for (let i = 1; i < lines.length; i++) {
                     const obj = {};
-                    const currentline = lines[i].split(",");
+                    const currentline = lines[i].split(delimiter);
 
                     for (let j = 0; j < headers.length; j++) {
                         obj[headers[j].trim()] = currentline[j] ? currentline[j].trim() : null;
